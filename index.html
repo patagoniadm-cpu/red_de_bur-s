@@ -1,1 +1,806 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Red de Burós Argentinos — Trabajo Colaborativo 2026–2028</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --indigo:#2F2B84;
+    --indigo-dark:#201C63;
+    --indigo-tint:#ECEBF7;
+    --indigo-tint-2:#DAD8F0;
+    --orange:#FF7A00;
+    --orange-tint:#FFF0DE;
+    --green:#5BA646;
+    --green-tint:#EAF4E7;
+    --ink:#20212E;
+    --ink-soft:#565A6E;
+    --paper:#F7F7FA;
+    --card:#FFFFFF;
+    --line:#E1E1EC;
+    --font-display:'Montserrat',-apple-system,'Segoe UI',sans-serif;
+    --font-mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+    --radius:14px;
+    --shadow:0 1px 2px rgba(32,33,46,.04), 0 8px 24px -12px rgba(32,33,46,.15);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:var(--font-display);
+    background:var(--paper);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    line-height:1.55;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.01ms !important; transition-duration:0.01ms !important;}
+  }
+  a{color:inherit;}
+  button{font-family:inherit;}
+  ::selection{background:var(--orange-tint);}
+  :focus-visible{outline:2.5px solid var(--orange); outline-offset:2px; border-radius:4px;}
 
+  .skiplink{position:absolute;left:-999px;}
+  .skiplink:focus{left:12px; top:12px; z-index:999; background:#fff; padding:8px 14px; border-radius:8px; box-shadow:var(--shadow);}
+
+  /* ---------- top identity bar ---------- */
+  .topbar{
+    background:var(--indigo);
+    background-image:radial-gradient(circle at 14% -40%, rgba(255,255,255,.10), transparent 55%);
+    color:#fff;
+    padding:22px 24px 20px;
+  }
+  .topbar-inner{max-width:980px; margin:0 auto; display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap;}
+  .brand-eyebrow{
+    font-family:var(--font-mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+    color:#C9C6EC; margin:0 0 6px;
+  }
+  .brand-title{margin:0; font-size:26px; font-weight:800; letter-spacing:-0.01em;}
+  .brand-sub{margin:4px 0 0; font-size:14px; color:#D6D4F0; font-weight:500;}
+  .brand-mark{
+    font-family:var(--font-mono); font-weight:700; font-size:13px; letter-spacing:.06em;
+    border:1px solid rgba(255,255,255,.35); border-radius:999px; padding:6px 14px; color:#fff; white-space:nowrap;
+  }
+
+  /* ---------- route nav ---------- */
+  .nav-wrap{background:#fff; border-bottom:1px solid var(--line); position:sticky; top:0; z-index:50;}
+  .nav-scroll{max-width:980px; margin:0 auto; overflow-x:auto; -ms-overflow-style:none; scrollbar-width:none;}
+  .nav-scroll::-webkit-scrollbar{display:none;}
+  .route-nav{display:flex; align-items:center; padding:14px 24px 0; min-width:max-content; gap:0;}
+  .route-step{display:flex; align-items:center;}
+  .route-connector{width:28px; height:2px; background:repeating-linear-gradient(to right, var(--line) 0 6px, transparent 6px 11px); margin:0 2px 20px;}
+  .tab-btn{
+    display:flex; align-items:center; gap:9px; background:none; border:none; cursor:pointer;
+    padding:8px 12px 20px; color:var(--ink-soft); font-weight:600; font-size:13.5px; white-space:nowrap;
+    border-bottom:3px solid transparent; transition:color .15s, border-color .15s;
+  }
+  .tab-index{
+    width:22px; height:22px; border-radius:50%; border:1.75px solid var(--line);
+    display:flex; align-items:center; justify-content:center; font-family:var(--font-mono);
+    font-size:11px; font-weight:700; color:var(--ink-soft); flex:none; transition:.15s;
+  }
+  .tab-btn:hover{color:var(--indigo);}
+  .tab-btn.active{color:var(--indigo); border-bottom-color:var(--orange);}
+  .tab-btn.active .tab-index{background:var(--indigo); border-color:var(--indigo); color:#fff;}
+  .tab-btn.results{margin-left:auto;}
+  .tab-btn.results .tab-index{border-radius:6px; border-color:var(--orange); color:var(--orange);}
+  .tab-btn.results.active .tab-index{background:var(--orange); border-color:var(--orange); color:#fff;}
+  .nav-divider{width:1px; align-self:stretch; background:var(--line); margin:8px 14px 20px 6px;}
+
+  /* ---------- layout ---------- */
+  main{max-width:980px; margin:0 auto; padding:40px 24px 90px;}
+  .panel{display:none; animation:fadein .35s ease;}
+  .panel.active{display:block;}
+  @keyframes fadein{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+
+  .eyebrow{font-family:var(--font-mono); font-size:11.5px; letter-spacing:.13em; text-transform:uppercase; color:var(--orange); font-weight:700; margin:0 0 10px;}
+  h2.section-title{font-size:27px; font-weight:800; margin:0 0 8px; letter-spacing:-0.01em; color:var(--indigo);}
+  .lede{font-size:15.5px; color:var(--ink-soft); max-width:640px; margin:0 0 32px;}
+
+  /* ---------- vision cards ---------- */
+  .quote-block{
+    background:var(--indigo); color:#fff; border-radius:var(--radius); padding:30px 32px; margin-bottom:28px;
+    position:relative; overflow:hidden;
+  }
+  .quote-block::before{
+    content:""; position:absolute; right:-40px; top:-40px; width:160px; height:160px; border-radius:50%;
+    background:radial-gradient(circle, rgba(255,122,0,.25), transparent 70%);
+  }
+  .quote-block p{margin:0; font-size:19px; font-weight:600; line-height:1.5; position:relative; max-width:640px;}
+
+  .qa-grid{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+  @media (max-width:720px){.qa-grid{grid-template-columns:1fr;}}
+  .qa-card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:22px 24px; box-shadow:var(--shadow);}
+  .qa-card h3{margin:0 0 10px; font-size:15px; color:var(--indigo); font-weight:700;}
+  .qa-card p{margin:0; font-size:14.5px; color:var(--ink-soft);}
+
+  .commitment-strip{
+    margin-top:28px; background:var(--green-tint); border:1px solid #CFE8C8; border-radius:var(--radius);
+    padding:22px 24px;
+  }
+  .commitment-strip .eyebrow{color:var(--green);}
+  .commitment-strip p{margin:0; font-size:14.5px; color:#33502B;}
+
+  /* ---------- 5 compromisos ---------- */
+  .compromisos-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin:24px 0 34px;}
+  @media (max-width:860px){.compromisos-grid{grid-template-columns:repeat(2,1fr);}}
+  @media (max-width:480px){.compromisos-grid{grid-template-columns:1fr;}}
+  .comp-card{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:18px 16px; text-align:left;}
+  .comp-icon{width:34px; height:34px; border-radius:9px; background:var(--indigo-tint); color:var(--indigo); display:flex; align-items:center; justify-content:center; margin-bottom:12px;}
+  .comp-card h4{margin:0 0 6px; font-size:14px; color:var(--indigo);}
+  .comp-card p{margin:0; font-size:12.8px; color:var(--ink-soft); line-height:1.5;}
+
+  /* ---------- recorrido stepper ---------- */
+  .stepper{display:flex; align-items:flex-start; margin:22px 0 36px; overflow-x:auto; padding-bottom:6px;}
+  .step{flex:1; min-width:150px; position:relative; padding-right:18px;}
+  .step:last-child{padding-right:0;}
+  .step-line{position:absolute; top:15px; left:34px; right:-4px; height:2px; background:repeating-linear-gradient(to right, var(--indigo-tint-2) 0 6px, transparent 6px 11px);}
+  .step:last-child .step-line{display:none;}
+  .step-num{
+    width:30px; height:30px; border-radius:50%; background:var(--indigo); color:#fff; font-family:var(--font-mono);
+    font-weight:700; font-size:13px; display:flex; align-items:center; justify-content:center; position:relative; z-index:2;
+  }
+  .step h5{margin:12px 0 4px; font-size:13.5px; color:var(--ink); font-weight:700;}
+  .step p{margin:0; font-size:12.5px; color:var(--ink-soft);}
+
+  /* ---------- principios chips ---------- */
+  .chip-row{display:flex; flex-wrap:wrap; gap:9px; margin:18px 0 8px;}
+  .chip{background:var(--indigo-tint); color:var(--indigo); font-size:12.5px; font-weight:700; padding:7px 14px; border-radius:999px;}
+
+  /* ---------- stage cards (shared: lineamientos preview + autoeval picker) ---------- */
+  .stage-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin:20px 0;}
+  @media (max-width:760px){.stage-grid{grid-template-columns:1fr;}}
+  .stage-card{
+    background:var(--card); border:1.75px solid var(--line); border-radius:var(--radius); padding:20px 20px 18px;
+    cursor:pointer; text-align:left; position:relative; transition:.15s; display:flex; flex-direction:column; gap:8px;
+  }
+  .stage-card:hover{border-color:var(--indigo-tint-2);}
+  .stage-card.selected{border-color:var(--stage-color, var(--indigo)); background:var(--stage-tint, var(--indigo-tint)); box-shadow:var(--shadow);}
+  .stage-tag{font-family:var(--font-mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; font-weight:700; color:var(--stage-color, var(--indigo));}
+  .stage-card h4{margin:0; font-size:16.5px; color:var(--ink); font-weight:800;}
+  .stage-card p{margin:0; font-size:12.8px; color:var(--ink-soft); line-height:1.55;}
+  .stage-check{position:absolute; top:16px; right:16px; width:20px; height:20px; border-radius:50%; border:1.75px solid var(--line); display:flex; align-items:center; justify-content:center;}
+  .stage-card.selected .stage-check{background:var(--stage-color, var(--indigo)); border-color:var(--stage-color, var(--indigo));}
+  .stage-card.selected .stage-check svg{opacity:1;}
+  .stage-check svg{opacity:0; width:12px; height:12px; stroke:#fff; stroke-width:3;}
+
+  .stage-note{font-size:12.5px; color:var(--ink-soft); font-style:italic; margin:10px 0 0; max-width:640px;}
+
+  /* ---------- forms ---------- */
+  .form-card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:26px 26px 24px; box-shadow:var(--shadow); margin-bottom:24px;}
+  .form-card h3{margin:0 0 4px; font-size:16px; color:var(--indigo);}
+  .form-card .sub{margin:0 0 18px; font-size:13px; color:var(--ink-soft);}
+  .field-row{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;}
+  @media (max-width:600px){.field-row{grid-template-columns:1fr;}}
+  label{display:block; font-size:12.5px; font-weight:700; color:var(--ink); margin-bottom:6px;}
+  input[type=text], input[type=email], textarea{
+    width:100%; border:1.5px solid var(--line); border-radius:9px; padding:10px 12px; font-size:14px;
+    font-family:inherit; color:var(--ink); background:#fff;
+  }
+  input:focus, textarea:focus{border-color:var(--indigo);}
+  textarea{resize:vertical; min-height:76px;}
+
+  .chip-select{display:flex; flex-wrap:wrap; gap:8px; margin-top:4px;}
+  .chip-option{
+    border:1.5px solid var(--line); background:#fff; border-radius:999px; padding:8px 14px; font-size:12.8px;
+    font-weight:600; color:var(--ink-soft); cursor:pointer; transition:.15s;
+  }
+  .chip-option.selected{background:var(--indigo); border-color:var(--indigo); color:#fff;}
+
+  .priority-list{display:flex; flex-direction:column; gap:10px; margin-top:6px;}
+  .priority-item{
+    display:flex; gap:12px; align-items:flex-start; border:1.5px solid var(--line); border-radius:11px; padding:13px 15px;
+    cursor:pointer; transition:.15s; background:#fff;
+  }
+  .priority-item.selected{border-color:var(--orange); background:var(--orange-tint);}
+  .priority-check{
+    width:20px; height:20px; border-radius:6px; border:1.75px solid var(--line); flex:none; margin-top:1px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .priority-item.selected .priority-check{background:var(--orange); border-color:var(--orange);}
+  .priority-check svg{opacity:0; width:12px; height:12px; stroke:#fff; stroke-width:3;}
+  .priority-item.selected .priority-check svg{opacity:1;}
+  .priority-text b{display:block; font-size:13.5px; color:var(--ink);}
+  .priority-text span{display:block; font-size:12px; color:var(--ink-soft); margin-top:2px;}
+  .priority-count{font-family:var(--font-mono); font-size:12px; color:var(--ink-soft); margin-top:8px;}
+
+  .btn{
+    display:inline-flex; align-items:center; gap:8px; background:var(--indigo); color:#fff; border:none; border-radius:10px;
+    padding:12px 22px; font-size:14px; font-weight:700; cursor:pointer; transition:.15s;
+  }
+  .btn:hover{background:var(--indigo-dark);}
+  .btn:disabled{background:#B8B7CE; cursor:not-allowed;}
+  .btn.orange{background:var(--orange);}
+  .btn.orange:hover{background:#E56E00;}
+  .btn.ghost{background:none; border:1.5px solid var(--line); color:var(--ink-soft);}
+  .btn.ghost:hover{border-color:var(--indigo); color:var(--indigo); background:none;}
+
+  .status-msg{margin-top:14px; font-size:13px; padding:10px 14px; border-radius:9px; display:none;}
+  .status-msg.show{display:block;}
+  .status-msg.ok{background:var(--green-tint); color:#2E4C27; }
+  .status-msg.err{background:#FBE7E4; color:#8A2E1F;}
+
+  /* ---------- agenda list ---------- */
+  .agenda-context{background:var(--indigo-tint); border-radius:var(--radius); padding:18px 20px; margin-bottom:20px; font-size:13.3px; color:var(--indigo);}
+
+  /* ---------- resultados ---------- */
+  .kpi-row{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:30px;}
+  @media (max-width:760px){.kpi-row{grid-template-columns:repeat(2,1fr);}}
+  .kpi-card{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:18px 18px;}
+  .kpi-num{font-size:28px; font-weight:800; color:var(--indigo); font-family:var(--font-mono);}
+  .kpi-label{font-size:11.5px; color:var(--ink-soft); font-weight:600; margin-top:4px;}
+
+  .bar-block{margin-bottom:10px;}
+  .bar-label{display:flex; justify-content:space-between; font-size:12.8px; font-weight:600; margin-bottom:5px;}
+  .bar-track{background:var(--indigo-tint); border-radius:999px; height:9px; overflow:hidden;}
+  .bar-fill{height:100%; border-radius:999px; background:var(--indigo);}
+
+  .results-table{width:100%; border-collapse:collapse; margin-top:8px; font-size:13px;}
+  .results-table th{text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft); border-bottom:1.5px solid var(--line); padding:8px 10px;}
+  .results-table td{padding:11px 10px; border-bottom:1px solid var(--line); vertical-align:top; color:var(--ink);}
+  .results-table tr:last-child td{border-bottom:none;}
+  .stage-pill{display:inline-block; padding:3px 10px; border-radius:999px; font-size:11px; font-weight:700; font-family:var(--font-mono);}
+  .empty-state{text-align:center; padding:50px 20px; color:var(--ink-soft);}
+  .empty-state svg{margin-bottom:14px; opacity:.5;}
+
+  .visibility-note{display:flex; gap:10px; align-items:flex-start; background:var(--orange-tint); border-radius:11px; padding:13px 16px; font-size:12.5px; color:#7A3E00; margin-bottom:24px;}
+
+  section.subsection{margin-top:38px;}
+  h3.sub-title{font-size:15px; color:var(--indigo); margin:0 0 14px; font-weight:800;}
+
+  footer.foot{max-width:980px; margin:0 auto; padding:0 24px 50px; color:var(--ink-soft); font-size:11.5px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;}
+</style>
+</head>
+<body>
+<a class="skiplink" href="#main">Saltar al contenido</a>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div>
+      <p class="brand-eyebrow">AOCA · Vicepresidencia de Burós</p>
+      <h1 class="brand-title">Red de Burós Argentinos</h1>
+      <p class="brand-sub">Trabajo colaborativo 2026–2028 · Programa E2.2 — Impulso a Burós</p>
+    </div>
+    <div class="brand-mark">HOJA DE RUTA COMPARTIDA</div>
+  </div>
+</div>
+
+<div class="nav-wrap">
+  <div class="nav-scroll">
+    <nav class="route-nav" id="routeNav">
+      <div class="route-step"><button class="tab-btn active" data-tab="vision"><span class="tab-index">1</span>Visión compartida</button></div>
+      <div class="route-connector"></div>
+      <div class="route-step"><button class="tab-btn" data-tab="lineamientos"><span class="tab-index">2</span>Lineamientos</button></div>
+      <div class="route-connector"></div>
+      <div class="route-step"><button class="tab-btn" data-tab="autoeval"><span class="tab-index">3</span>Autoevaluación</button></div>
+      <div class="route-connector"></div>
+      <div class="route-step"><button class="tab-btn" data-tab="agenda"><span class="tab-index">4</span>Agenda: tus prioridades</button></div>
+      <div class="nav-divider"></div>
+      <button class="tab-btn results" data-tab="resultados"><span class="tab-index">R</span>Resultados</button>
+    </nav>
+  </div>
+</div>
+
+<main id="main">
+
+  <!-- ============ TAB 1: VISIÓN ============ -->
+  <section class="panel active" id="panel-vision">
+    <p class="eyebrow">Documento 1</p>
+    <h2 class="section-title">Una visión compartida para los burós argentinos</h2>
+    <p class="lede">Antes de hablar de acciones, un mismo punto de partida: qué es un buró, para qué existe y qué se compromete a hacer AOCA junto a la Red.</p>
+
+    <div class="quote-block">
+      <p>“Creemos en una Argentina donde cada reunión deje un legado que trascienda su impacto económico — que fortalezca el conocimiento, la identidad, la competitividad, la sostenibilidad y el orgullo de los destinos que la reciben.”</p>
+    </div>
+
+    <div class="qa-grid">
+      <div class="qa-card">
+        <h3>¿Qué es un Bureau?</h3>
+        <p>La institución que articula los actores de un territorio para proyectar su identidad, fortalecer su competitividad y transformar la industria de reuniones en una herramienta de desarrollo para la comunidad.</p>
+      </div>
+      <div class="qa-card">
+        <h3>¿Para qué existen?</h3>
+        <p>Para articular los actores de un territorio y construir destinos con identidad, capaces de atraer reuniones, generar oportunidades y dejar un legado en sus comunidades. Su valor no se mide solo en cantidad de eventos, sino en su capacidad de generar vínculos y trabajo conjunto.</p>
+      </div>
+      <div class="qa-card">
+        <h3>La mirada compartida</h3>
+        <p>Una industria de reuniones que no solo convoque personas, sino que impulse comunidades, transforme territorios y genere oportunidades duraderas para las próximas generaciones, a lo largo y ancho del país.</p>
+      </div>
+      <div class="qa-card">
+        <h3>El compromiso de AOCA</h3>
+        <p>Acompañar, fortalecer, representar e impulsar a los burós argentinos para que cada destino exprese su identidad y desarrolle todo su potencial, promoviendo una Red cada vez más integrada, colaborativa y federal.</p>
+      </div>
+    </div>
+
+    <div class="commitment-strip">
+      <p class="eyebrow">Cómo se lee este documento</p>
+      <p>No es un reglamento ni un plan cerrado: es un punto de partida para construir, junto con los propios burós, una agenda compartida. Las próximas tres pestañas — Lineamientos, Autoevaluación y Agenda — son exactamente eso: el primer tramo de esa construcción conjunta.</p>
+    </div>
+  </section>
+
+  <!-- ============ TAB 2: LINEAMIENTOS ============ -->
+  <section class="panel" id="panel-lineamientos">
+    <p class="eyebrow">Documento 2</p>
+    <h2 class="section-title">Lineamientos para el desarrollo de la Red · 2026–2028</h2>
+    <p class="lede">Fortalecer la Red mediante una gestión cercana, federal y colaborativa: intercambio de experiencias, representación institucional y desarrollo de iniciativas que generen valor para los destinos.</p>
+
+    <h3 class="sub-title">Los cinco compromisos de la Vicepresidencia</h3>
+    <div class="compromisos-grid">
+      <div class="comp-card"><div class="comp-icon" data-icon="escuchar"></div><h4>Escuchar</h4><p>Diálogo permanente con los burós: experiencias, necesidades, desafíos y oportunidades.</p></div>
+      <div class="comp-card"><div class="comp-icon" data-icon="representar"></div><h4>Representar</h4><p>Canalizar hacia la Comisión Directiva las propuestas, inquietudes y necesidades de la Red.</p></div>
+      <div class="comp-card"><div class="comp-icon" data-icon="gestionar"></div><h4>Gestionar</h4><p>Promover iniciativas y facilitar la articulación con las áreas de AOCA y otras instituciones.</p></div>
+      <div class="comp-card"><div class="comp-icon" data-icon="conectar"></div><h4>Conectar</h4><p>Favorecer el intercambio de experiencias, proyectos y buenas prácticas entre burós.</p></div>
+      <div class="comp-card"><div class="comp-icon" data-icon="acompanar"></div><h4>Acompañar</h4><p>Promover acciones acordes con las distintas realidades de cada buró.</p></div>
+    </div>
+
+    <h3 class="sub-title">Un recorrido en cuatro etapas</h3>
+    <div class="stepper">
+      <div class="step"><div class="step-line"></div><div class="step-num">1</div><h5>Autoevaluación</h5><p>Cada buró se autoevalúa con una herramienta común.</p></div>
+      <div class="step"><div class="step-line"></div><div class="step-num">2</div><h5>Validación compartida</h5><p>Se analiza junto al espacio de trabajo que AOCA defina.</p></div>
+      <div class="step"><div class="step-line"></div><div class="step-num">3</div><h5>Planificación del acompañamiento</h5><p>Se identifican necesidades, prioridades y oportunidades.</p></div>
+      <div class="step"><div class="step-num">4</div><h5>Revisión y mejora</h5><p>Recorrido dinámico: se actualizan diagnósticos y acciones.</p></div>
+    </div>
+
+    <h3 class="sub-title">Principios de trabajo</h3>
+    <div class="chip-row">
+      <span class="chip">Federalismo</span><span class="chip">Autonomía</span><span class="chip">Construcción colectiva</span>
+      <span class="chip">Transparencia</span><span class="chip">Intercambio</span><span class="chip">Mejora continua</span>
+      <span class="chip">Continuidad institucional</span>
+    </div>
+
+    <div class="subsection">
+      <h3 class="sub-title">Anexo I · Camino de Desarrollo Institucional</h3>
+      <p class="lede" style="margin-bottom:14px;">Tres etapas, no una calificación: una herramienta para orientar el acompañamiento. En la pestaña <b>Autoevaluación</b> cada buró se identifica voluntariamente en una de ellas.</p>
+      <div class="stage-grid">
+        <div class="stage-card" style="--stage-color:var(--green); --stage-tint:var(--green-tint); cursor:default;">
+          <span class="stage-tag">Etapa 1</span><h4>Buró Emergente</h4>
+          <p>En creación o consolidación inicial: fortaleciendo su organización, incorporando socios, consolidando su gobernanza y posicionando progresivamente al destino.</p>
+        </div>
+        <div class="stage-card" style="--stage-color:var(--indigo); --stage-tint:var(--indigo-tint); cursor:default;">
+          <span class="stage-tag">Etapa 2</span><h4>Buró Consolidado</h4>
+          <p>Funcionamiento estable, planificación y gestión profesional, con resultados sostenidos. Consolidó su rol como articulador del destino.</p>
+        </div>
+        <div class="stage-card" style="--stage-color:var(--orange); --stage-tint:var(--orange-tint); cursor:default;">
+          <span class="stage-tag">Etapa 3</span><h4>Buró Referente</h4>
+          <p>Gestión consolidada y liderazgo en la industria: agenda permanente de postulaciones, generación de conocimiento y aporte activo al crecimiento de toda la Red.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TAB 3: AUTOEVALUACIÓN ============ -->
+  <section class="panel" id="panel-autoeval">
+    <p class="eyebrow">Paso 1 del recorrido</p>
+    <h2 class="section-title">Autoevaluación institucional</h2>
+    <p class="lede">No es una evaluación ni una certificación: es la forma en que tu buró se identifica dentro del Camino de Desarrollo Institucional, para orientar el acompañamiento que AOCA construye con la Red.</p>
+
+    <div class="visibility-note">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" style="flex:none;"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+      <span>Esta respuesta queda visible para AOCA y para el resto de la Red en la pestaña <b>Resultados</b> — así se construye colectivamente, como marcan los principios de transparencia e intercambio de este documento.</span>
+    </div>
+
+    <div class="form-card">
+      <h3>Datos del buró</h3>
+      <p class="sub">Se usan para identificar tu respuesta dentro de la Red.</p>
+      <div class="field-row">
+        <div><label for="ae-nombre">Nombre del buró *</label><input type="text" id="ae-nombre" placeholder="Ej. Bureau de Convenciones de Mendoza"></div>
+        <div><label for="ae-provincia">Provincia / destino</label><input type="text" id="ae-provincia" placeholder="Ej. Mendoza"></div>
+      </div>
+      <div class="field-row">
+        <div><label for="ae-contacto">Quién completa (nombre)</label><input type="text" id="ae-contacto" placeholder="Ej. Presidente/a del buró"></div>
+        <div><label for="ae-email">Email de contacto</label><input type="email" id="ae-email" placeholder="opcional"></div>
+      </div>
+    </div>
+
+    <div class="form-card">
+      <h3>Elegí la etapa que mejor representa hoy a tu buró</h3>
+      <p class="sub">Leé las tres descripciones y seleccioná una.</p>
+      <div class="stage-grid" id="stagePicker">
+        <button type="button" class="stage-card" data-stage="Emergente" style="--stage-color:var(--green); --stage-tint:var(--green-tint);">
+          <span class="stage-check"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7"/></svg></span>
+          <span class="stage-tag">Etapa 1</span><h4>Buró Emergente</h4>
+          <p>En creación o consolidación inicial: fortaleciendo organización, socios, gobernanza y posicionamiento del destino.</p>
+        </button>
+        <button type="button" class="stage-card" data-stage="Consolidado" style="--stage-color:var(--indigo); --stage-tint:var(--indigo-tint);">
+          <span class="stage-check"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7"/></svg></span>
+          <span class="stage-tag">Etapa 2</span><h4>Buró Consolidado</h4>
+          <p>Funcionamiento estable, planificación y gestión profesional, con resultados sostenidos en el tiempo.</p>
+        </button>
+        <button type="button" class="stage-card" data-stage="Referente" style="--stage-color:var(--orange); --stage-tint:var(--orange-tint);">
+          <span class="stage-check"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7"/></svg></span>
+          <span class="stage-tag">Etapa 3</span><h4>Buró Referente</h4>
+          <p>Gestión consolidada y liderazgo: agenda permanente de postulaciones y aporte activo a toda la Red.</p>
+        </button>
+      </div>
+
+      <label for="ae-comentario" style="margin-top:18px;">¿Por qué elegiste esa etapa? (opcional)</label>
+      <textarea id="ae-comentario" placeholder="Un par de líneas alcanzan."></textarea>
+
+      <label style="margin-top:16px;">Principales desafíos de tu buró hoy <span style="font-weight:400; color:var(--ink-soft);">(elegí los que apliquen)</span></label>
+      <div class="chip-select" id="desafiosSelect">
+        <button type="button" class="chip-option" data-value="Institucional / normativo">Institucional / normativo</button>
+        <button type="button" class="chip-option" data-value="Capacitación">Capacitación</button>
+        <button type="button" class="chip-option" data-value="Financiamiento">Financiamiento</button>
+        <button type="button" class="chip-option" data-value="Visibilidad y negocios">Visibilidad y negocios</button>
+        <button type="button" class="chip-option" data-value="Beneficios y networking">Beneficios y networking</button>
+      </div>
+
+      <div style="margin-top:22px;">
+        <button class="btn" id="submitAutoeval">Enviar autoevaluación</button>
+        <div class="status-msg" id="autoevalStatus"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TAB 4: AGENDA ============ -->
+  <section class="panel" id="panel-agenda">
+    <p class="eyebrow">Anexo II · Documento 2</p>
+    <h2 class="section-title">Agenda inicial de gestión — tus prioridades</h2>
+    <p class="lede">Esta es la agenda de arranque propuesta por la Vicepresidencia de Burós. Es dinámica: se actualiza con lo que la Red aporte.</p>
+
+    <div class="agenda-context">
+      Elegí hasta <b>3 acciones</b> que consideres más urgentes para tu buró en este arranque, y sumá cualquier comentario o idea que quieras agregar a la agenda.
+    </div>
+
+    <div class="form-card">
+      <h3>Elegí tus prioridades</h3>
+      <p class="sub"><span id="priorityCounter">0</span> de 3 seleccionadas</p>
+      <div class="priority-list" id="priorityList">
+        <!-- populated by JS -->
+      </div>
+
+      <label for="ag-comentario" style="margin-top:20px;">¿Algo para agregar o comentar sobre esta agenda? (opcional)</label>
+      <textarea id="ag-comentario" placeholder="Ideas, eventos, necesidades puntuales de tu destino..."></textarea>
+
+      <div class="field-row" style="margin-top:16px;">
+        <div><label for="ag-nombre">Nombre del buró *</label><input type="text" id="ag-nombre" placeholder="Ej. Bureau de Convenciones de Mendoza"></div>
+        <div><label for="ag-provincia">Provincia / destino</label><input type="text" id="ag-provincia" placeholder="Ej. Mendoza"></div>
+      </div>
+
+      <div style="margin-top:10px;">
+        <button class="btn orange" id="submitAgenda">Enviar mis prioridades</button>
+        <div class="status-msg" id="agendaStatus"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TAB 5: RESULTADOS ============ -->
+  <section class="panel" id="panel-resultados">
+    <p class="eyebrow">Vista consolidada</p>
+    <h2 class="section-title">Resultados de la Red</h2>
+    <p class="lede">Lo que fue enviando cada buró en Autoevaluación y en Agenda, consolidado en un solo lugar.</p>
+    <div style="margin-bottom:22px;"><button class="btn ghost" id="refreshResults">Actualizar</button></div>
+    <div id="resultsContent">
+      <div class="empty-state">Cargando resultados…</div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <span>AOCA · Vicepresidencia de Burós · Programa E2.2 — Impulso a Burós</span>
+  <span>Documento de trabajo — 2026–2028</span>
+</footer>
+
+<script>
+/* ---------------- ICONS ---------------- */
+const ICONS = {
+  escuchar: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><path d="M4 14a8 8 0 1116 0"/><path d="M4 14v3a2 2 0 002 2h1v-6H5a1 1 0 00-1 1z"/><path d="M20 14v3a2 2 0 01-2 2h-1v-6h1a1 1 0 011 1z"/></svg>',
+  representar: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v18"/><path d="M6 4h11l-2.5 3.5L17 11H6"/></svg>',
+  gestionar: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>',
+  conectar: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><circle cx="5" cy="12" r="2.4"/><circle cx="19" cy="6" r="2.4"/><circle cx="19" cy="18" r="2.4"/><path d="M7.2 11l9.6-4M7.2 13l9.6 4"/></svg>',
+  acompanar: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h13M12 6l6 6-6 6"/></svg>'
+};
+document.querySelectorAll('.comp-icon').forEach(el => { el.innerHTML = ICONS[el.dataset.icon] || ''; });
+
+/* ---------------- DATA LAYER: Google Sheets via Apps Script ---------------- */
+// Después de desplegar el Apps Script como aplicación web, pegá la URL acá abajo:
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxilPg1SuAlkiqa25aC7TiJpDLCsCSCP2qzL-nZg6y2GW4OHpausrIeI6aGjp_TZ868/exec";
+
+function scriptConfigured(){
+  return !!APPS_SCRIPT_URL && !APPS_SCRIPT_URL.includes('PEGA_AQUI');
+}
+
+async function postToScript(tipo, payload){
+  const res = await fetch(APPS_SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // evita el preflight CORS con Apps Script
+    body: JSON.stringify({ tipo, payload })
+  });
+  const data = await res.json();
+  if(!data.ok) throw new Error(data.error || 'error desconocido');
+  return data;
+}
+
+async function getFromScript(tipo){
+  const res = await fetch(`${APPS_SCRIPT_URL}?tipo=${tipo}`);
+  const data = await res.json();
+  if(!data.ok) throw new Error(data.error || 'error desconocido');
+  return data.items;
+}
+
+/* ---------------- TAB SWITCHING ---------------- */
+const tabButtons = document.querySelectorAll('.tab-btn');
+tabButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    tabButtons.forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+    window.scrollTo({top:0, behavior:'smooth'});
+    if(btn.dataset.tab === 'resultados'){ loadResults(); }
+  });
+});
+
+/* ---------------- SHARED IN-MEMORY STATE (not browser storage — just page memory) ---------------- */
+let sharedBuroName = '';
+function syncBuroNameFields(source){
+  const val = source.value.trim();
+  sharedBuroName = val;
+  ['ae-nombre','ag-nombre'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && el !== source && !el.value) el.value = val;
+  });
+}
+document.getElementById('ae-nombre').addEventListener('input', e => syncBuroNameFields(e.target));
+document.getElementById('ag-nombre').addEventListener('input', e => syncBuroNameFields(e.target));
+
+function slugify(str){
+  return (str||'').toString().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') || 'sin-nombre';
+}
+
+/* ---------------- STAGE PICKER (autoeval) ---------------- */
+let selectedStage = null;
+document.querySelectorAll('#stagePicker .stage-card').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('#stagePicker .stage-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    selectedStage = card.dataset.stage;
+  });
+});
+
+/* ---------------- DESAFIOS CHIPS ---------------- */
+let selectedDesafios = [];
+document.querySelectorAll('#desafiosSelect .chip-option').forEach(chip => {
+  chip.addEventListener('click', () => {
+    chip.classList.toggle('selected');
+    const v = chip.dataset.value;
+    selectedDesafios = chip.classList.contains('selected')
+      ? [...selectedDesafios, v]
+      : selectedDesafios.filter(x => x !== v);
+  });
+});
+
+/* ---------------- SUBMIT AUTOEVAL ---------------- */
+function showStatus(el, ok, msg){
+  el.textContent = msg;
+  el.className = 'status-msg show ' + (ok ? 'ok' : 'err');
+}
+
+document.getElementById('submitAutoeval').addEventListener('click', async () => {
+  const nombre = document.getElementById('ae-nombre').value.trim();
+  const statusEl = document.getElementById('autoevalStatus');
+  if(!nombre){ showStatus(statusEl, false, 'Ingresá el nombre del buró para continuar.'); return; }
+  if(!selectedStage){ showStatus(statusEl, false, 'Elegí una etapa del Camino de Desarrollo Institucional.'); return; }
+
+  const btn = document.getElementById('submitAutoeval');
+  btn.disabled = true; btn.textContent = 'Enviando…';
+
+  const payload = {
+    nombre,
+    provincia: document.getElementById('ae-provincia').value.trim(),
+    contacto: document.getElementById('ae-contacto').value.trim(),
+    email: document.getElementById('ae-email').value.trim(),
+    etapa: selectedStage,
+    comentario: document.getElementById('ae-comentario').value.trim(),
+    desafios: selectedDesafios,
+    timestamp: new Date().toISOString()
+  };
+
+  if(!scriptConfigured()){
+    showStatus(statusEl, false, 'Falta conectar la planilla: pegá la URL de Apps Script en el HTML (ver instrucciones).');
+    btn.disabled = false; btn.textContent = 'Enviar autoevaluación';
+    return;
+  }
+
+  try{
+    const data = await postToScript('autoeval', payload);
+    showStatus(statusEl, true, data.result === 'updated' ? '¡Actualizamos la respuesta de ' + nombre + '!' : '¡Gracias! Autoevaluación de ' + nombre + ' registrada.');
+  }catch(err){
+    showStatus(statusEl, false, 'No pudimos guardar la respuesta. Probá de nuevo en unos segundos.');
+  }finally{
+    btn.disabled = false; btn.textContent = 'Enviar autoevaluación';
+  }
+});
+
+/* ---------------- AGENDA PRIORITIES ---------------- */
+const AGENDA_ITEMS = [
+  {id:'meetup', titulo:'Meet Up', desc:'Presentar la visión compartida e iniciar el diálogo con los presidentes de burós.'},
+  {id:'encuentro-nacional', titulo:'Encuentro Nacional de Presidentes de Burós', desc:'Consolidar un espacio permanente de intercambio entre presidentes.'},
+  {id:'destinos-mdp', titulo:'Encuentro de Destinos Sede — Mar del Plata', desc:'Intercambio de experiencias entre destinos sede y articulación institucional.'},
+  {id:'presentacion-lineamientos', titulo:'Presentación de los Lineamientos de Gestión', desc:'Poner a consideración de la Red los documentos institucionales.'},
+  {id:'diseno-autoeval', titulo:'Diseño de la herramienta de autoevaluación', desc:'Instrumento común para que cada buró analice su situación institucional.'},
+  {id:'espacio-validacion', titulo:'Definición del espacio de validación', desc:'Ámbito institucional que acompañará la revisión y mejora del proceso.'},
+  {id:'inicio-autoeval', titulo:'Inicio del proceso de autoevaluación', desc:'Primera caracterización de la Red y definición de prioridades.'},
+  {id:'planificacion-acompanamiento', titulo:'Planificación del acompañamiento', desc:'Acciones específicas según necesidades detectadas en cada categoría.'},
+  {id:'herramientas-especificas', titulo:'Desarrollo de herramientas específicas', desc:'Programas y recursos concretos para el crecimiento institucional.'},
+  {id:'indicadores', titulo:'Indicadores de seguimiento', desc:'Indicadores simples para medir avances y ajustar acciones.'}
+];
+let selectedPriorities = [];
+const priorityListEl = document.getElementById('priorityList');
+AGENDA_ITEMS.forEach(item => {
+  const row = document.createElement('div');
+  row.className = 'priority-item';
+  row.dataset.id = item.id;
+  row.innerHTML = `<span class="priority-check"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7"/></svg></span>
+    <span class="priority-text"><b>${item.titulo}</b><span>${item.desc}</span></span>`;
+  row.addEventListener('click', () => {
+    const isSel = row.classList.contains('selected');
+    if(!isSel && selectedPriorities.length >= 3) return;
+    row.classList.toggle('selected');
+    selectedPriorities = isSel ? selectedPriorities.filter(x => x !== item.id) : [...selectedPriorities, item.id];
+    document.getElementById('priorityCounter').textContent = selectedPriorities.length;
+  });
+  priorityListEl.appendChild(row);
+});
+
+document.getElementById('submitAgenda').addEventListener('click', async () => {
+  const nombre = document.getElementById('ag-nombre').value.trim();
+  const statusEl = document.getElementById('agendaStatus');
+  if(!nombre){ showStatus(statusEl, false, 'Ingresá el nombre del buró para continuar.'); return; }
+  if(selectedPriorities.length === 0){ showStatus(statusEl, false, 'Elegí al menos una prioridad.'); return; }
+
+  const btn = document.getElementById('submitAgenda');
+  btn.disabled = true; btn.textContent = 'Enviando…';
+
+  const payload = {
+    nombre,
+    provincia: document.getElementById('ag-provincia').value.trim(),
+    prioridades: selectedPriorities,
+    comentario: document.getElementById('ag-comentario').value.trim(),
+    timestamp: new Date().toISOString()
+  };
+
+  if(!scriptConfigured()){
+    showStatus(statusEl, false, 'Falta conectar la planilla: pegá la URL de Apps Script en el HTML (ver instrucciones).');
+    btn.disabled = false; btn.textContent = 'Enviar mis prioridades';
+    return;
+  }
+
+  try{
+    const data = await postToScript('aportes', payload);
+    showStatus(statusEl, true, data.result === 'updated' ? '¡Actualizamos las prioridades de ' + nombre + '!' : '¡Gracias! Prioridades de ' + nombre + ' registradas.');
+  }catch(err){
+    showStatus(statusEl, false, 'No pudimos guardar la respuesta. Probá de nuevo en unos segundos.');
+  }finally{
+    btn.disabled = false; btn.textContent = 'Enviar mis prioridades';
+  }
+});
+
+/* ---------------- RESULTADOS ---------------- */
+const STAGE_COLORS = {Emergente:'#5BA646', Consolidado:'#2F2B84', Referente:'#FF7A00'};
+let resultsLoaded = false;
+
+async function loadResults(){
+  const container = document.getElementById('resultsContent');
+  if(!scriptConfigured()){
+    container.innerHTML = '<div class="empty-state">Falta conectar la planilla: pegá la URL de Apps Script en el HTML (ver instrucciones) para ver los resultados acá.</div>';
+    return;
+  }
+  container.innerHTML = '<div class="empty-state">Cargando resultados…</div>';
+  try{
+    const [autoevals, aportes] = await Promise.all([
+      getFromScript('autoeval'),
+      getFromScript('aportes')
+    ]);
+    renderResults(container, autoevals, aportes);
+  }catch(err){
+    container.innerHTML = '<div class="empty-state">No pudimos cargar los resultados ahora. Probá con "Actualizar".</div>';
+  }
+}
+
+function renderResults(container, autoevals, aportes){
+  if(autoevals.length === 0 && aportes.length === 0){
+    container.innerHTML = `<div class="empty-state">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12h4l2 5 4-14 2 9h6"/></svg>
+      <p>Todavía no hay respuestas cargadas.<br>En cuanto los burós completen Autoevaluación o Agenda, van a aparecer acá.</p>
+    </div>`;
+    return;
+  }
+
+  const uniqueBuros = new Set([...autoevals.map(a=>a.nombre), ...aportes.map(a=>a.nombre)]);
+
+  // stage distribution
+  const stageCounts = {Emergente:0, Consolidado:0, Referente:0};
+  autoevals.forEach(a => { if(stageCounts[a.etapa] !== undefined) stageCounts[a.etapa]++; });
+  const maxStage = Math.max(1, ...Object.values(stageCounts));
+
+  // desafios ranking
+  const desafiosCount = {};
+  autoevals.forEach(a => (a.desafios||[]).forEach(d => { desafiosCount[d] = (desafiosCount[d]||0)+1; }));
+  const desafiosSorted = Object.entries(desafiosCount).sort((a,b)=>b[1]-a[1]);
+  const maxDesafio = Math.max(1, ...desafiosSorted.map(d=>d[1]));
+
+  // agenda priority ranking
+  const agendaCount = {};
+  aportes.forEach(a => (a.prioridades||[]).forEach(p => { agendaCount[p] = (agendaCount[p]||0)+1; }));
+  const agendaSorted = Object.entries(agendaCount).sort((a,b)=>b[1]-a[1]);
+  const maxAgenda = Math.max(1, ...agendaSorted.map(d=>d[1]));
+  const agendaTitle = id => (AGENDA_ITEMS.find(i=>i.id===id)||{}).titulo || id;
+
+  let html = '';
+  html += `<div class="kpi-row">
+    <div class="kpi-card"><div class="kpi-num">${uniqueBuros.size}</div><div class="kpi-label">Burós participantes</div></div>
+    <div class="kpi-card"><div class="kpi-num">${autoevals.length}</div><div class="kpi-label">Autoevaluaciones</div></div>
+    <div class="kpi-card"><div class="kpi-num">${aportes.length}</div><div class="kpi-label">Aportes a la agenda</div></div>
+    <div class="kpi-card"><div class="kpi-num">${stageCounts.Referente}</div><div class="kpi-label">Burós Referentes</div></div>
+  </div>`;
+
+  html += `<section class="subsection"><h3 class="sub-title">Distribución por etapa institucional</h3>`;
+  ['Emergente','Consolidado','Referente'].forEach(s => {
+    const pct = Math.round((stageCounts[s]/maxStage)*100);
+    html += `<div class="bar-block">
+      <div class="bar-label"><span>${s}</span><span>${stageCounts[s]}</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%; background:${STAGE_COLORS[s]}"></div></div>
+    </div>`;
+  });
+  html += `</section>`;
+
+  if(desafiosSorted.length){
+    html += `<section class="subsection"><h3 class="sub-title">Desafíos más mencionados</h3>`;
+    desafiosSorted.forEach(([d,c]) => {
+      const pct = Math.round((c/maxDesafio)*100);
+      html += `<div class="bar-block"><div class="bar-label"><span>${d}</span><span>${c}</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:${pct}%; background:var(--indigo)"></div></div></div>`;
+    });
+    html += `</section>`;
+  }
+
+  if(agendaSorted.length){
+    html += `<section class="subsection"><h3 class="sub-title">Prioridades de agenda más votadas</h3>`;
+    agendaSorted.forEach(([id,c]) => {
+      const pct = Math.round((c/maxAgenda)*100);
+      html += `<div class="bar-block"><div class="bar-label"><span>${agendaTitle(id)}</span><span>${c} voto${c===1?'':'s'}</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:${pct}%; background:var(--orange)"></div></div></div>`;
+    });
+    html += `</section>`;
+  }
+
+  // detail table merged by buró name
+  const byName = {};
+  autoevals.forEach(a => { byName[a.nombre] = byName[a.nombre] || {}; byName[a.nombre].autoeval = a; });
+  aportes.forEach(a => { byName[a.nombre] = byName[a.nombre] || {}; byName[a.nombre].aportes = a; });
+
+  html += `<section class="subsection"><h3 class="sub-title">Detalle por buró</h3>
+    <table class="results-table"><thead><tr>
+      <th>Buró</th><th>Provincia</th><th>Etapa</th><th>Desafíos</th><th>Prioridades de agenda</th><th>Comentarios</th>
+    </tr></thead><tbody>`;
+  Object.entries(byName).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([nombre, d]) => {
+    const ae = d.autoeval, ap = d.aportes;
+    const etapaHtml = ae ? `<span class="stage-pill" style="background:${STAGE_COLORS[ae.etapa]}22; color:${STAGE_COLORS[ae.etapa]}">${ae.etapa}</span>` : '—';
+    const provincia = (ae && ae.provincia) || (ap && ap.provincia) || '—';
+    const desafiosTxt = ae && ae.desafios && ae.desafios.length ? ae.desafios.join(', ') : '—';
+    const prioridadesTxt = ap && ap.prioridades && ap.prioridades.length ? ap.prioridades.map(agendaTitle).join(', ') : '—';
+    const comentarios = [ae && ae.comentario, ap && ap.comentario].filter(Boolean).join(' · ') || '—';
+    html += `<tr><td><b>${escapeHtml(nombre)}</b></td><td>${escapeHtml(provincia)}</td><td>${etapaHtml}</td>
+      <td>${escapeHtml(desafiosTxt)}</td><td>${escapeHtml(prioridadesTxt)}</td><td>${escapeHtml(comentarios)}</td></tr>`;
+  });
+  html += `</tbody></table></section>`;
+
+  container.innerHTML = html;
+}
+
+function escapeHtml(str){
+  const d = document.createElement('div');
+  d.textContent = str == null ? '' : String(str);
+  return d.innerHTML;
+}
+
+document.getElementById('refreshResults').addEventListener('click', loadResults);
+</script>
+</body>
+</html>
